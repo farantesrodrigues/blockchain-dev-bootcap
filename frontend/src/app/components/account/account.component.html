@@ -1,0 +1,28 @@
+<mat-card *ngIf="balance">
+  <mat-card-header>
+    <img mat-card-avatar [src]="getAvatarSrc()" alt="User avatar" />
+    <mat-card-title>Account</mat-card-title>
+    <mat-card-subtitle>Account</mat-card-subtitle>
+  </mat-card-header>
+  <mat-card-content [class]="account-content">
+    <h4>Your address is:</h4>
+    <h6>{{ direction }}</h6>
+
+    <h4>Balance:</h4>
+    <h5>{{ balance }} ETH</h5>
+    <ng-content select="[content]"></ng-content>
+  </mat-card-content>
+  <mat-card-actions align="end">
+    <ng-content select="[actions]"></ng-content>
+  </mat-card-actions>
+</mat-card>
+
+<mat-card *ngIf="!balance">
+  <mat-card-content [class]="account-content">
+    <h3>Web3 enabled browser and secure wallet required.</h3>
+    <h4>Metamask is installed and has the permissions required ?</h4>
+  </mat-card-content>
+  <mat-card-actions align="end">
+    <button mat-button (click)="getMetamask()">Get Metamask</button>
+  </mat-card-actions>
+</mat-card>

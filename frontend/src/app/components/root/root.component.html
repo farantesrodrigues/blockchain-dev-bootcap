@@ -1,0 +1,13 @@
+<mat-toolbar color="primary">
+  <mat-toolbar-row>
+    <span>Consensys Project</span>
+    <span fxFlex="auto"></span>
+    <button mat-icon-button aria-label="Transaction" (click)="goToTransaction()">
+      <mat-icon svgIcon="send"></mat-icon>
+    </button>
+    <button mat-icon-button aria-label="Account" (click)="goToAccount()">
+      <mat-icon svgIcon="account-badge-horizontal"></mat-icon>
+    </button>
+  </mat-toolbar-row>
+</mat-toolbar>
+<router-outlet></router-outlet>

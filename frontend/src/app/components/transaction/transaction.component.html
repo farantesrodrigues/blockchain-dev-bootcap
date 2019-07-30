@@ -1,0 +1,34 @@
+<app-account>
+  <ng-container content>
+    <form [formGroup]="transactionForm">
+      <div fxLayout="row" fxLayoutGap="15px">
+        <mat-form-field fxFlex="auto" appearance="outline">
+          <mat-label>Transfer Destiny</mat-label>
+          <input matInput min="0" formControlName="sendaddress" />
+          <mat-error *ngIf="transactionForm.errors?.sendaddress">
+            {{ transactionForm.errors.sendaddress }}</mat-error
+          >
+        </mat-form-field>
+        <mat-form-field fxFlex="auto" appearance="outline">
+          <mat-label>Ether Amout(ETH)</mat-label>
+          <input matInput min="0" formControlName="amount" />
+          <mat-error *ngIf="transactionForm.errors?.amount">
+            {{ transactionForm.errors.amount }}</mat-error
+          >
+        </mat-form-field>
+      </div>
+    </form>
+  </ng-container>
+  <ng-container actions>
+    <button
+      mat-raised-button
+      [disabled]="!transactionForm.valid"
+      (click)="transferEth($event)"
+    >
+      <mat-icon *ngIf="!transactionForm.valid">lock</mat-icon>
+      <mat-icon *ngIf="transactionForm.valid">input</mat-icon>
+      Ether
+    </button>
+    <button mat-raised-button (click)="reset()">Reset</button>
+  </ng-container>
+</app-account>
