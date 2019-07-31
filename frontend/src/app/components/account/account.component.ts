@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { ContractService } from "../../services/contract/contract.service";
+import { Web3Service } from "../../services/contract/contract.service";
 
 @Component({
   selector: "app-account",
@@ -10,7 +10,7 @@ export class AccountComponent implements OnInit {
   direction: string;
   balance: string;
 
-  constructor(private contractService: ContractService) {}
+  constructor(private contractService: Web3Service) {}
 
   ngOnInit() {
     this.contractService

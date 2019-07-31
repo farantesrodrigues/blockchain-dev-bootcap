@@ -18,7 +18,7 @@ import {
   RootComponent,
   TransactionComponent
 } from "./components";
-import { ContractService } from "./services/contract/contract.service";
+import { Web3Service } from "./services/contract/contract.service";
 
 @NgModule({
   declarations: [
@@ -43,7 +43,7 @@ import { ContractService } from "./services/contract/contract.service";
     FlexLayoutModule,
     AppRoutingModule
   ],
-  providers: [ContractService],
+  providers: [Web3Service],
   bootstrap: [RootComponent]
 })
 export class AppModule {

@@ -1,25 +1,31 @@
-import { Injectable } from "@angular/core";
+import { Injectable, NgZone } from "@angular/core";
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { from, Observable, of, Subject, zip } from "rxjs";
-import { catchError, map, switchMap, tap } from "rxjs/operators";
-import contract from "truffle-contract";
+import { from, Observable, of, zip } from "rxjs";
+import { catchError, first, map, switchMap } from "rxjs/operators";
 import Web3 from "web3";
 
 declare let require: any;
 const tokenAbi = require("../../../../../Blockchain/build/contracts/Payment.json");
 declare let window: any;
 
+export interface Transaction {
+  from: string;
+  to: string;
+  value: string;
+}
+
 @Injectable({
   providedIn: "root"
 })
-export class ContractService {
+export class Web3Service {
   private web3: Web3;
   public compatible: boolean;
-  private accounts: string[];
-  public accountsObservable = new Subject<string[]>();
 
-  constructor(private snackbar: MatSnackBar) {
-    // is web3 enabled
+  constructor(private snackbar: MatSnackBar, private ngZone: NgZone) {
+    this.loadWeb3();
+  }
+
+  async loadWeb3() {
     if (
       typeof window.ethereum !== "undefined" ||
       typeof window.web3 !== "undefined"
@@ -28,99 +34,69 @@ export class ContractService {
       const provider = window["ethereum"] || window.web3.currentProvider;
       console.log("isMetaMask", provider.isMetaMask);
       this.web3 = new Web3(provider);
+
+      try {
+        // Request account access if needed
+        const enabled = await provider.enable();
+        console.log("metamask enabled", enabled);
+        // Acccounts now exposed
+        this.web3.eth.getCoinbase().then(a => console.log(a));
+        this.web3.eth.getAccounts().then(a => console.log(a));
+      } catch (error) {
+        console.error(error);
+      }
     } else {
       const provider = new Web3.providers.HttpProvider("HTTP://127.0.0.1:7545");
       this.web3 = new Web3(provider);
     }
-    console.log("web3.version", this.web3.version);
-    console.log(
-      "web3.defaultAccount",
-      this.web3.defaultAccount,
-      this.web3.eth.defaultAccount
-    );
   }
 
   seeAccountInfo(): Observable<{ originAccount: string; balance: string }> {
-    const that = this;
     return from(this.web3.eth.getCoinbase()).pipe(
-      tap((account) => console.log("1", account, typeof account, this.web3.eth.defaultBlock)),
       switchMap(account => {
-        return zip(of(account), this.web3.eth.getBalance(account, this.web3.eth.defaultBlock));
+        const getBalance = from(this.web3.eth.getBalance(account)).pipe(
+          map(wei => {
+            return this.web3.utils.fromWei(wei, "ether");
+          })
+        );
+        return zip(of(account), getBalance);
       }),
-      tap(a => console.log("3", a)),
       map(([originAccount, balance]) => ({ originAccount, balance })),
       catchError((err: any) => {
-        this.failure(
+        this.handleError(
           "Could't get the account data, please check if metamask is running correctly and refresh the page"
         );
         return of({ originAccount: "unknown", balance: "-" });
-      })
+      }),
+      first()
     );
   }
 
-  refreshAccounts() {
-    window.web3.eth.getAccounts((err, accs) => {
-      console.log("Refreshing accounts");
-      if (err === true) {
-        console.warn("There was an error fetching your accounts.");
-        console.log(err, accs);
-        return;
-      }
-
-      // Get the initial account balance so it can be displayed.
-      if (accs.length === 0) {
-        console.warn(
-          "Couldn't get any accounts! Make sure your Ethereum client is configured correctly."
-        );
-        return;
-      }
-
-      if (
-        !this.accounts ||
-        this.accounts.length !== accs.length ||
-        this.accounts[0] !== accs[0]
-      ) {
-        console.log("Observed new accounts");
-
-        this.accountsObservable.next(accs);
-        this.accounts = accs;
-      }
-
-      console.log("ready");
-    });
-  }
-
-  trasnferEther(originAccount: string, destinyAccount: string, amount: string) {
-    return new Promise((resolve, reject) => {
-      const paymentContract = contract(tokenAbi);
-      paymentContract.setProvider(this.web3);
-
-      paymentContract
-        .deployed()
-        .then(instance => {
-          return instance.nuevaTransaccion(destinyAccount, {
-            from: originAccount,
-            value: window.web3.utils.toWei(amount, "ether")
+  // it's still not clear to me why can't I pipe into the stream to handle success and failure
+  // I tried from operator to convert promise to observable, bindNodeCallback
+  // (from here https://stackoverflow.com/questions/48876234/how-to-make-observable-from-callback)
+  // I tried injecting ngZone because meybe something to do with angular,
+  // and I tried the classical Promise based solution. Still no luck at handling the callback from
+  // sendTransaction.
+  async transferEther(to: string, amount: number) {
+    const account = await this.web3.eth.getCoinbase();
+    const value = this.web3.utils.toWei(amount.toString(), "ether");
+    const transaction = { from: account, to, value };
+    return new Promise(res => {
+      this.web3.eth.sendTransaction(transaction).then(success => {
+        if (success) {
+          this.snackbar.open("transaction successful", "Dismiss", {
+            duration: 3000
           });
-        })
-        .then(status => {
-          if (status) {
-            return resolve({ status: true });
-          }
-        })
-        .catch(error => {
-          console.log(error);
-
-          return reject("Error transfering Ether");
-        });
+        } else {
+          this.handleError("something went wrong with transaction");
+        }
+        res(success);
+      });
     });
   }
 
-  failure(message: string) {
+  handleError(message: string) {
     this.snackbar.open(message, "Dismiss");
-  }
-
-  succes() {
-    this.snackbar.open("Transaction complete successfuly", "Dismiss");
   }
 }
