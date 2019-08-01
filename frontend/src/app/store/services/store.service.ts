@@ -16,6 +16,10 @@ export interface Transaction {
   value: string;
 }
 
+/**
+ * @desc in this service is where we call all the methods exposed by the contracts
+ * and also is where we deploy the contracts
+ */
 @Injectable({
   providedIn: "root"
 })
@@ -32,6 +36,9 @@ export class StoreService {
     return this.company$.getValue();
   }
 
+  /**
+   * @desc initial check to see if all is well loading web3
+   */
   async loadWeb3() {
     if (
       typeof window.ethereum !== "undefined" ||
@@ -313,4 +320,6 @@ export class StoreService {
       { duration: 3000 }
     );
   }
+
+  // a lot of repetition here, I know...
 }

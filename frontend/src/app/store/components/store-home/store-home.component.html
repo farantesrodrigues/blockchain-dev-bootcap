@@ -32,6 +32,10 @@
     store's people according to your set of permissions
   </p>
 
+  <p>
+    A note for address fields : all are expecting 0x + Keccak-256 hash
+  </p>
+
   <br />
 
   <p *ngIf="companyAddress">
@@ -42,7 +46,7 @@
   <br />
 
   <mat-form-field fxFlex="auto" appearance="outline" *ngIf="!companyAddress">
-    <mat-label>Company Address (0x + Keccak-256 hash)</mat-label>
+    <mat-label>Company Address</mat-label>
     <input matInput [formControl]="companyAddressInput" />
     <mat-error *ngFor="let error of companyAddressInput.errors | keyvalue">{{
       valMsgs[error.key]

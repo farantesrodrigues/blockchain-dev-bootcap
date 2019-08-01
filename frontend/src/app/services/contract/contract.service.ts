@@ -4,8 +4,6 @@ import { from, Observable, of, zip } from "rxjs";
 import { catchError, first, map, switchMap } from "rxjs/operators";
 import Web3 from "web3";
 
-declare let require: any;
-const tokenAbi = require("../../../../../Blockchain/build/contracts/Payment.json");
 declare let window: any;
 
 export interface Transaction {

@@ -61,14 +61,14 @@ export class StoreFrontComponent implements OnInit {
   }
 
   registerEmployee() {
-    const {address, name} = this.managerInput.value;
+    const {address, name} = this.employeeInput.value;
     this.storeService.registerEmployee(this.storeAddress, address, name).then(async () => {
       this.employeeInput.reset();
     });
   }
 
   registerClient() {
-    const {address, name} = this.managerInput.value;
+    const {address, name} = this.clientInput.value;
     this.storeService.registerClient(this.storeAddress, address, name).then(async () => {
       this.clientInput.reset();
     });
