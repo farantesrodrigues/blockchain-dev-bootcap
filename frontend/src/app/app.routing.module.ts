@@ -19,7 +19,11 @@ const routes: Routes = [
     component: TransactionComponent,
     data: { name: "transaction" }
   },
-  { path: "account", component: AccountComponent, data: { name: "account" } }
+  { path: "account", component: AccountComponent, data: { name: "account" } },
+  {
+    path: 'store',
+    loadChildren: () => import('./store/store.module').then(mod => mod.StoreModule)
+  }
 ];
 
 @NgModule({

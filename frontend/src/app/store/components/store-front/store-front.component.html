@@ -1,0 +1,133 @@
+<div fxLayout="column" style="padding: 1rem 2rem" class="mat-typography">
+  <section>
+    <h3>Store info</h3>
+
+    <p>Here you can interact with a store contract that has been deployed</p>
+
+    <p>
+      Very simply you can register managers, employees and clients, according to
+      the permission level (role).
+    </p>
+
+    <p>
+      Unfortunately due to time contraints this interface is oversimplified in
+      relation to it's blockchain counterpart. One piece of information that
+      would be most useful here would be a listing of all the users. Currently
+      printing a mapping is an expensive operation, but by changing the data
+      structure something useful could be produced. Next time, I gues...
+    </p>
+  </section>
+
+  <br />
+
+  <mat-card>
+    <mat-card-content>
+      <mat-list>
+        <mat-list-item
+          >Store Address : <strong>{{ storeAddress }}</strong></mat-list-item
+        >
+        <mat-list-item
+          >Store Name : <strong>{{ storeName }}</strong></mat-list-item
+        >
+        <mat-list-item
+          >User Name : <strong>{{ myUser?.name }}</strong></mat-list-item
+        >
+        <mat-list-item
+          >User Responsible :
+          <strong>{{ myUser?.responsible }}</strong></mat-list-item
+        >
+        <mat-list-item
+          >User Role : <strong>{{ myUser?.role }}</strong></mat-list-item
+        >
+      </mat-list>
+    </mat-card-content>
+  </mat-card>
+
+  <br />
+  <br />
+  <br />
+
+  <section fxLayout="column">
+    <h5>Modify Store Name</h5>
+    <mat-form-field fxFlex="auto" appearance="outline">
+      <mat-label>New Store Name</mat-label>
+      <input matInput [formControl]="storeNameInput" />
+    </mat-form-field>
+    <button mat-raised-button color="primary" (click)="modifyStoreName()">
+      Call contract
+    </button>
+  </section>
+
+  <br />
+  <br />
+  <br />
+
+  <section
+    fxLayout="column"
+    *ngIf="myUser?.role === 'OWNER'"
+    [formGroup]="managerInput"
+  >
+    <h5>Register Manager</h5>
+    <mat-form-field fxFlex="auto" appearance="outline">
+      <mat-label>Manager Address</mat-label>
+      <input matInput formControlName="address" />
+    </mat-form-field>
+    <mat-form-field fxFlex="auto" appearance="outline">
+      <mat-label>Manager Name</mat-label>
+      <input matInput formControlName="name" />
+    </mat-form-field>
+    <button mat-raised-button color="primary" (click)="registerManager()">
+      Call contract
+    </button>
+  </section>
+
+  <br />
+  <br />
+  <br />
+
+  <section
+    fxLayout="column"
+    *ngIf="myUser?.role === 'OWNER' || myUser?.role === 'MANAGER'"
+    [formGroup]="employeeInput"
+  >
+    <h5>Register Employee</h5>
+    <mat-form-field fxFlex="auto" appearance="outline">
+      <mat-label>Employee Address</mat-label>
+      <input matInput formControlName="address" />
+    </mat-form-field>
+    <mat-form-field fxFlex="auto" appearance="outline">
+      <mat-label>Employee Name</mat-label>
+      <input matInput formControlName="name" />
+    </mat-form-field>
+    <button mat-raised-button color="primary" (click)="registerEmployee()">
+      Call contract
+    </button>
+  </section>
+
+  <br />
+  <br />
+  <br />
+
+  <section
+    fxLayout="column"
+    *ngIf="
+      myUser?.role === 'OWNER' ||
+      myUser?.role === 'MANAGER' ||
+      myUser?.role === 'EMPLOYEE'
+    "
+    [formGroup]="clientInput"
+  >
+    <h5>Register Client</h5>
+    <mat-form-field fxFlex="auto" appearance="outline">
+      <mat-label>Client Address</mat-label>
+      <input matInput formControlName="address" />
+    </mat-form-field>
+    <mat-form-field fxFlex="auto" appearance="outline">
+      <mat-label>Client Name</mat-label>
+      <input matInput formControlName="name" />
+    </mat-form-field>
+    <button mat-raised-button color="primary" (click)="registerClient()">
+      Call contract
+    </button>
+  </section>
+</div>

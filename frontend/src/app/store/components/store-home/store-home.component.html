@@ -1,0 +1,91 @@
+<div fxLayout="column" style="padding: 1rem 2rem" class="mat-typography">
+  <h3>Company info</h3>
+
+  <p>
+    Our story has a Company and multiple Stores, a bit like in decentralized
+    franchise system
+  </p>
+
+  <p>
+    This module is a raw prototype to manage the people interacting with each
+    store/company
+  </p>
+
+  <p>There are 2 smart contracts : Company and Store</p>
+
+  <p>
+    The Company, merely keeps a mapping of stores to owners. We can for example
+    list all the stores belonging to a certain user. In this route you can do
+    just that. Either by inputing a known address for a company or by deploying
+    a new Company contract (i.e.: creating an empty company) you can list all
+    the stores belonging to it
+  </p>
+
+  <p>
+    Time constraints didn't allow to map the store addresses to human names or
+    to add delete buttons to remove the store (the method is in teh contract
+    though)
+  </p>
+
+  <p>
+    From here, you can create a Store or visit an existing one to manage the
+    store's people according to your set of permissions
+  </p>
+
+  <br />
+
+  <p *ngIf="companyAddress">
+    <strong>Company address</strong> (copy somewhere) <strong>:</strong>
+    {{ companyAddress }}
+  </p>
+
+  <br />
+
+  <mat-form-field fxFlex="auto" appearance="outline" *ngIf="!companyAddress">
+    <mat-label>Company Address (0x + Keccak-256 hash)</mat-label>
+    <input matInput [formControl]="companyAddressInput" />
+    <mat-error *ngFor="let error of companyAddressInput.errors | keyvalue">{{
+      valMsgs[error.key]
+    }}</mat-error>
+  </mat-form-field>
+
+  <button
+    mat-raised-button
+    (click)="useInputAddress()"
+    *ngIf="!companyAddress"
+    [disabled]="companyAddressInput.invalid"
+  >
+    Use address in input box
+  </button>
+
+  <br />
+
+  <button
+    mat-raised-button
+    (click)="createCompany()"
+    *ngIf="!companyAddress"
+    [disabled]="!!companyAddressInput.value"
+  >
+    Create New Company
+  </button>
+
+  <br />
+
+  <button mat-raised-button (click)="listUserStores()" *ngIf="companyAddress">
+    List Stores (calls contract)
+  </button>
+
+  <mat-nav-list *ngIf="companyAddress">
+    <mat-list-item>
+      <a matLine [routerLink]="['/store/create']">Create a new Store</a>
+    </mat-list-item>
+    <mat-list-item *ngIf="listStoresCalled && stores?.length === 0">
+      <a matLine [routerLink]="['/store/create']"
+        >Currently empty (create a store)</a
+      >
+    </mat-list-item>
+    <mat-list-item *ngFor="let store of stores">
+      <a matLine [routerLink]="['/store/front', store]">{{ store }}</a>
+    </mat-list-item>
+  </mat-nav-list>
+</div>

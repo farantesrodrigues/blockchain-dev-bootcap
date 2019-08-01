@@ -1,0 +1,64 @@
+<div fxLayout="column" style="padding: 1rem 2rem" class="mat-typography">
+  <p>
+    Create a new Store (a decentralized franchise of Company) by registering
+    it's employee 0 - the owner - give him a name
+  </p>
+
+  <p>
+    A Store is a contract that holds a mapping of the different users involved
+    in the store business :
+  </p>
+
+  <p>The owner</p>
+  <p>The manager</p>
+  <p>The employee</p>
+  <p>The client</p>
+
+  <p>
+    The permission set is decreasing with the list. The owner can register
+    managers (and all others). A manager can register employees (and clients).
+    An employee can register clients.
+  </p>
+
+  <p>
+    To interact with the contract, a few methods are available, such as
+    registering new users, according to your set of permissions. To do that,
+    once created, visit the store front (by front we mean the frontend side of
+    the contract, in fact this is more like a back office)
+  </p>
+
+  <p>
+    The permissions are structured in an Enum called roles. Modifiers check
+    before any user is registered that the msg.sender has the adequate level
+  </p>
+
+  <br />
+  <br />
+
+  <section *ngIf="createdAddress.length">
+    <mat-nav-list>
+      <h3 matSubheader>Visit Store :</h3>
+      <mat-list-item *ngFor="let address of createdAddress">
+        <a matLine [routerLink]="['/store/front', address]">{{ address }}</a>
+      </mat-list-item>
+    </mat-nav-list>
+  </section>
+
+  <br *ngIf="createdAddress.length" />
+  <br *ngIf="createdAddress.length" />
+
+  <mat-form-field fxFlex="auto" appearance="outline">
+    <mat-label>Owner Name</mat-label>
+    <input matInput [formControl]="userName" />
+  </mat-form-field>
+
+  <button mat-raised-button color="primary" (click)="create()">
+    Create Store
+  </button>
+
+  <br />
+
+  <button mat-raised-button [routerLink]="['/store']">
+    Back to Store List
+  </button>
+</div>

@@ -17,4 +17,8 @@ export class RootComponent {
   goToTransaction() {
     this.router.navigate(['/transaction']);
   }
+
+  goToStore() {
+    this.router.navigate(['/store']);
+  }
 }
