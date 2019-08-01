@@ -45,20 +45,6 @@ contract Store {
         _;
     }
 
-    // only owners can register managers
-    function registerManager(address _resp, string memory _name)
-        public canOwner
-    {
-        registerUser(_resp, _name, Role.MANAGER);
-    }
-
-    // only managers (or owners) can register employees
-    function registerEmployee(address _resp, string memory _name)
-        public canManager
-    {
-        registerUser(_resp, _name, Role.EMPLOYEE);
-    }
-
     // only managers (or owners) can register employees
     function modifyStoreName(string memory _name)
         public canManager
@@ -66,11 +52,35 @@ contract Store {
         storeName = _name;
     }
 
+    // only owners can register managers
+    function registerManager(address _address, string memory _name)
+        public canOwner
+    {
+        registerUser(_address, _name, Role.MANAGER);
+    }
+
     // only managers (or owners) can register employees
-    function registerClient(address _resp, string memory _name)
+    function registerEmployee(address _address, string memory _name)
+        public canManager
+    {
+        registerUser(_address, _name, Role.EMPLOYEE);
+    }
+
+    // only managers (or owners) can register employees
+    function registerClient(address _address, string memory _name)
         public canEmployee
     {
-        registerUser(_resp, _name, Role.CLIENT);
+        registerUser(_address, _name, Role.CLIENT);
+    }
+
+    function registerUser(address _address, string memory _name, Role _role) private {
+        Strings.validate(_name);
+        User memory newUser;
+        newUser.name = _name;
+        newUser.responsible = msg.sender;
+        newUser.role = Role(_role);
+        users[_address] = newUser;
+        emit RegisteredNewUser(_name, _role);
     }
 
     // only employees can access user data
@@ -78,15 +88,5 @@ contract Store {
         public view canEmployee returns(string memory name, Role role, address responsible)
     {
         return (users[_user].name, users[_user].role, users[_user].responsible);
-    }
-
-    function registerUser(address _resp, string memory _name, Role _role) private {
-        Strings.validate(_name);
-        User memory newUser;
-        newUser.name = _name;
-        newUser.responsible = _resp;
-        newUser.role = Role(_role);
-        users[msg.sender] = newUser;
-        emit RegisteredNewUser(_name, _role);
     }
 }
